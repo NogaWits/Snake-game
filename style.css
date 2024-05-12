@@ -1,0 +1,131 @@
+
+@font-face
+{
+    src:url(fonts/PressStart2P-Regular.ttf);
+    font-family:game-font;
+
+}
+
+
+
+/*style for the game board*/
+#gameBoard
+{
+    border:2px solid black;
+    position: relative;
+}
+
+
+/*style for the game interface (aka board,score etc..)*/
+#gameInterface
+{
+    
+    text-align:center;
+}
+
+
+/*removes the element from the layout*/
+.notDisplayed
+{
+    display:none;
+}
+
+/*the style for the menu page (first page displayed)*/
+#menu
+{
+    border:2px solid;
+    height:400px;
+    width:600px;
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    background-color: palegreen;
+    text-align:center;
+    
+    
+}
+
+
+
+
+/*the style for all of the buttons in the layout*/
+button
+{
+    background-color: palegreen;
+    border:palegreen;
+    width:200px;
+    height:100px;
+    font-family:game-font;
+    font-size: 30px;
+    
+
+}
+
+button:hover
+{
+    background-color: rgb(88, 150, 88);
+    
+}
+
+/*the style for the header in the menu*/
+#header
+{
+    font-family:game-font;
+    font-size:100px;
+}
+
+/*the lost text*/
+#lostText
+{
+    font-family:game-font;
+    font-size:50px;
+}
+
+
+/*style for the lost screen (displayed when playes loses)*/
+#lostScreen
+{
+    text-align: center;
+    background-color: palegreen;
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    height:260px;
+    width:600px;
+    opacity: 0.5;
+}
+
+
+
+#scoreText
+{
+    font-size:50px;
+}
+
+
+
+
+table,th,td
+{
+    border:1px solid black;
+
+
+}
+
+
+#scoreTable
+{
+    width:100%;
+}
+
+
+th
+{
+    background-color:palegreen;
+    font-family:game-font;
+}
+
+
+
