@@ -20,6 +20,7 @@ let leaderBoardBtn=document.getElementById("leaderBoardBtn");
 let scoreText=document.getElementById("scoreText");
 let moveInterval;
 let direction="";
+let paused=false;
 let speed=200;
 let snake;
 let food={x:0,y:0};
@@ -40,6 +41,7 @@ let colors=
     "Indigo",
     "Violet"
 ]
+
 
 /*create the players name+score 2dArray
 if exists in local storage just fetch it and convert into an array, if doesnt exist create empty arr*/
@@ -73,12 +75,21 @@ let collideWithSelf=new Audio("collidewithself.wav");
 let collideWithWall=new Audio("collidewithwall.ogg");
 let click=new Audio("click.mp3");
 
+
+
+// add event listeners to the leader board button and the menu button
 leaderBoardBtn.addEventListener("click",enterLeaderBoard);
 menuBtn.addEventListener("click",enterMenu);
 
 
 /*when the start button is clicked,the startGame func is fired*/
 startBtn.addEventListener("click", startGame);
+
+
+/* when the player clicks on the canvas we want 
+to essentialy fire the handleCanvasClick funtion 
+that either pauses or resumes the game*/
+canvas.addEventListener("click",handleCanvasClick);
 
 
 /*when any button in the layout is clicked, we play the click sound*/
@@ -97,23 +108,26 @@ for(i of btns)
 /*initializes a new game*/
 function startGame()
 {
-
-    // delete all rows from the score table to prevent duplicates
-
-    
-
-
-
-
-
+    /* the user is required to enter his name
+    if not entered the app will alert and won't proceed*/
     if(nameInput.value!="")
     {
+        // first we want to store the user's name
     userName=nameInput.value;
+
+    // hide the menu screen and the name input
     menu.classList.add("notDisplayed");
     nameScreen.classList.add("notDisplayed");
+
+    // show the board and the score
     gameInterface.classList.remove("notDisplayed");
+
+    //set the score's value to zero
     score=0;
-    scoreText.innerText=score+"0";
+    scoreText.innerText=scoreLogic(score);
+
+    /* we want to clear the board to make sure 
+    there are no remains from previous games*/
     ctx.clearRect(0,0,width,height);
     ctx.globalAlpha=1;
 snake=
@@ -133,6 +147,8 @@ document.addEventListener("keydown",move);
     }
 
 
+
+    // in case the user input is empty
     else 
     {
         alert("you must enter your name!!");
@@ -395,7 +411,7 @@ function moveUp()
     {
         if(head.x==snake[i].x && head.y-30==snake[i].y)
         {
-            console.log("ughh");
+            
             collideWithSelf.play();
             lostFunction();
             break;
@@ -706,6 +722,61 @@ function scoreLogic(score)
     return score<10? "0"+score:score;
 
 }
+
+
+function getMoveFunc(key)
+{
+    switch(key)
+    {
+        case "ArrowRight":
+        moveInterval=setInterval(moveRight,speed)
+        break;
+
+        case "ArrowLeft":
+            moveInterval=setInterval(moveLeft,speed)
+            break;
+
+            case "ArrowUp":
+                moveInterval=setInterval(moveUp,speed);
+                break;
+
+                case "ArrowDown":
+                    moveInterval=setInterval(moveDown,speed);
+                    break;
+    }
+
+}
+
+
+
+function handleCanvasClick()
+{
+  if(!paused)
+  {
+    clearInterval(moveInterval);
+    document.removeEventListener("keydown",move);
+    ctx.globalAlpha=0.5;
+    paused=true;
+
+
+  }
+
+  else
+  {
+    ctx.globalAlpha=1;
+    getMoveFunc(direction);
+    document.addEventListener("keydown",move);
+    paused=false;
+    
+  }
+
+
+}
+
+
+
+
+
 
 
 
