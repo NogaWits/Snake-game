@@ -107,25 +107,3 @@ button:hover
 
 
 
-table,th,td
-{
-    border:1px solid black;
-
-
-}
-
-
-#scoreTable
-{
-    width:100%;
-}
-
-
-th
-{
-    background-color:palegreen;
-    font-family:game-font;
-}
-
-
-

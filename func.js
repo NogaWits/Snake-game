@@ -1,22 +1,14 @@
 
-
-
 let canvas=document.getElementById("gameBoard");
 let ctx=canvas.getContext("2d");
 let height=canvas.height;
 let width=canvas.width;
 
-let nameInput=document.getElementById("nameInput");
-let userName;
-let scoreTable=document.getElementById("scoreTable");
-let nameScreen=document.getElementById("nameScreen");
-let leaderBoard=document.getElementById("leaderBoard");
 let gameInterface=document.getElementById("gameInterface");
 let lostScreen=document.getElementById("lostScreen");
 let menu=document.getElementById("menu");
 let startBtn=document.getElementById("startBtn");
 let menuBtn=document.getElementById("menuBtn");
-let leaderBoardBtn=document.getElementById("leaderBoardBtn");
 let scoreText=document.getElementById("scoreText");
 let moveInterval;
 let direction="";
@@ -26,7 +18,7 @@ let snake;
 let food={x:0,y:0};
 let score=0;
 let unit=30;
-let snakeColor="SpringGreen";
+let snakeColor="Green";
 let foodColor;
 let btns=document.querySelectorAll("button");
 let key="";
@@ -40,45 +32,20 @@ let colors=
     "Blue",
     "Indigo",
     "Violet"
-]
+];
 
-
-/*create the players name+score 2dArray
-if exists in local storage just fetch it and convert into an array, if doesnt exist create empty arr*/
-
-let namesArr;
-if(localStorage.length==0)
-{
-
-    namesArr=[];
-
-}
-
-else
-{
-    namesArr=JSON.parse(localStorage.getItem("arr"));
-
-    for(let i=0; i<namesArr.length; i++)
-    {
-        namesArr[i]=JSON.parse(namesArr[i]);
-    }
-
-    
-    
-}
 
 
 
 //sounds
-let collectApple=new Audio("good-6081.mp3");
-let collideWithSelf=new Audio("collidewithself.wav");
-let collideWithWall=new Audio("collidewithwall.ogg");
-let click=new Audio("click.mp3");
+let collectApple=new Audio("sounds/good-6081.mp3");
+let collideWithSelf=new Audio("sounds/collidewithself.wav");
+let collideWithWall=new Audio("sounds/collidewithwall.ogg");
+let click=new Audio("sounds/click.mp3");
 
 
 
-// add event listeners to the leader board button and the menu button
-leaderBoardBtn.addEventListener("click",enterLeaderBoard);
+// add event listener to the menu button
 menuBtn.addEventListener("click",enterMenu);
 
 
@@ -86,10 +53,6 @@ menuBtn.addEventListener("click",enterMenu);
 startBtn.addEventListener("click", startGame);
 
 
-/* when the player clicks on the canvas we want 
-to essentialy fire the handleCanvasClick funtion 
-that either pauses or resumes the game*/
-canvas.addEventListener("click",handleCanvasClick);
 
 
 /*when any button in the layout is clicked, we play the click sound*/
@@ -108,16 +71,16 @@ for(i of btns)
 /*initializes a new game*/
 function startGame()
 {
-    /* the user is required to enter his name
-    if not entered the app will alert and won't proceed*/
-    if(nameInput.value!="")
-    {
-        // first we want to store the user's name
-    userName=nameInput.value;
-
-    // hide the menu screen and the name input
+    // hide the menu screen 
     menu.classList.add("notDisplayed");
-    nameScreen.classList.add("notDisplayed");
+
+    /* when the player clicks on the canvas we want 
+to fire the handleCanvasClick function 
+that either pauses or resumes the game*/
+canvas.addEventListener("click",handleCanvasClick);
+
+    
+    direction="";
 
     // show the board and the score
     gameInterface.classList.remove("notDisplayed");
@@ -148,16 +111,9 @@ document.addEventListener("keydown",move);
 
 
 
-    // in case the user input is empty
-    else 
-    {
-        alert("you must enter your name!!");
-    }
-
-
 
     
-}
+
 
 
 
@@ -196,7 +152,8 @@ function createOrgan(organ)
 }
 
 
-// creates food, appears in a random position that aligns with the snake
+/* creates food, appears in a random position 
+that take in account the snake's presence*/
 function createFood()
 {
     ctx.beginPath();
@@ -209,7 +166,6 @@ function createFood()
 
     while(!isFreePlace(x,y))
     {
-        console.log("oops, this place is taken.. trying again");
         x=unit*Math.floor(Math.random()*(canvas.width/unit));
         y=unit*Math.floor(Math.random()*(canvas.height/unit));
 
@@ -219,7 +175,13 @@ function createFood()
     food.y=y;
     
 
-    foodColor=colors[Math.floor(Math.random()*colors.length)];
+    let rnd=colors[Math.floor(Math.random()*colors.length)];
+    while(rnd==snakeColor)
+    {
+        rnd=colors[Math.floor(Math.random()*colors.length)];
+    }
+
+    foodColor=rnd;
     
     
 
@@ -340,8 +302,6 @@ function moveRight()
     {
         if(head.y==snake[i].y && head.x+30==snake[i].x)
         {
-
-           console.log("ughh");
             collideWithSelf.play();
             lostFunction();
             break;
@@ -531,11 +491,7 @@ function appleCollected()
         newX=last.x;
     }
         
-    snake.forEach(organ=>
-    {
-        ctx.clearRect(organ.x,organ.y,unit,unit);
-        
-    })
+   clearCanvas();
 
     
 
@@ -558,154 +514,25 @@ function appleCollected()
 {
     
    clearInterval(moveInterval);
+   canvas.removeEventListener('click',handleCanvasClick);
     document.removeEventListener("keydown",move);
-    
-    ctx.globalAlpha=0.5;
 
     //making the effect of trasperrency
-    snake.forEach(organ=>
-    {
-        ctx.clearRect(organ.x,organ.y,unit,unit);
-
-    })
-
-    ctx.clearRect(food.x,food.y,unit,unit);
+    clearCanvas();
+    
 
     ctx.globalAlpha=0.5;
 
     createSnake();
-
-    ctx.beginPath();
-    ctx.fillStyle=foodColor;
-    ctx.rect(food.x,food.y,unit,unit);
-    ctx.fill();
-    ctx.closePath();
+    drawFood();
     lostScreen.classList.remove("notDisplayed");
-    
-
-    //add player to local storgae
-    // store the score and the name in an array
-    
-        
-    
-    if(score>0)
-    {
-    localStorage.clear();
-    let dup=false;
-    
-
-    if(namesArr.length>0)
-    {
-        
-        namesArr.forEach(item=>{
-            if(item[0]==userName)
-            {
-                if(Number(item[1])<score)
-                {
-                    item[1]=score;
-                    dup=true;
-                }
-            }
-        })
-
-    
-    }
-
-    if(!dup)
-    {
-       namesArr.push([userName,score.toString()]);
-    }
-
-
-let tempArr=[];
-namesArr.forEach(item=>{
-    tempArr.push(JSON.stringify(item));
-})
-
-
-    localStorage.setItem("arr",JSON.stringify(tempArr));
-    
-    }
-
-
-
-
-        
-
     
 }
 
 
-function enterLeaderBoard()
-{
-    
-    let max=-1;
-    let absMax=-1;
-    let rank=1;
-    
-
-    while(rank<=namesArr.length)
-    {
-        max=-1;
-        for(let j=0; j<namesArr.length; j++)
-        {
-            let value=Number(namesArr[j][1]);
 
 
-            if(value>max)
-            {
-                if(absMax>-1)
-                {
-                    if(value<absMax)
-                    {
-                        max=value;
-                    }
 
-                }
-
-                else
-                {
-                    max=value;
-                }
-
-            }
-        }
-
-
-            absMax=max;
-
-            for(let k=0; k<namesArr.length; k++)
-            {
-                if(Number(namesArr[k][1])==absMax)
-                {
-                    let row=scoreTable.insertRow(scoreTable.rows.length);
-                    let cell1=row.insertCell(0);
-                    let cell2=row.insertCell(1);
-                    let cell3=row.insertCell(2);
-
-                    cell1.innerText="#"+rank;
-                    cell2.innerText=namesArr[k][0];
-                    cell3.innerText=namesArr[k][1];
-                    rank++;
-
-                }
-            }
-
-
-        }
-
-        leaderBoard.classList.remove("notDisplayed");
-        lostScreen.classList.add("notDisplayed");
-        gameInterface.classList.add("notDisplayed");
-    
-    
-
-
-    }
-
-    
-    
-    
 
 function enterMenu()
 {
@@ -715,6 +542,17 @@ function enterMenu()
 }
 
 
+function clearCanvas()
+{
+    snake.forEach(organ=>
+        {
+            ctx.clearRect(organ.x,organ.y,unit,unit);
+    
+        })
+    
+        ctx.clearRect(food.x,food.y,unit,unit);
+
+}
 
 function scoreLogic(score)
 {
@@ -723,6 +561,15 @@ function scoreLogic(score)
 
 }
 
+function drawFood()
+{
+    ctx.beginPath();
+    ctx.fillStyle=foodColor;
+    ctx.rect(food.x,food.y,unit,unit);
+    ctx.fill();
+    ctx.closePath();
+
+}
 
 function getMoveFunc(key)
 {
@@ -755,7 +602,10 @@ function handleCanvasClick()
   {
     clearInterval(moveInterval);
     document.removeEventListener("keydown",move);
+    clearCanvas();
     ctx.globalAlpha=0.5;
+    createSnake();
+    drawFood();
     paused=true;
 
 
@@ -764,6 +614,9 @@ function handleCanvasClick()
   else
   {
     ctx.globalAlpha=1;
+    clearCanvas();
+    createSnake();
+    drawFood();
     getMoveFunc(direction);
     document.addEventListener("keydown",move);
     paused=false;
