@@ -227,7 +227,7 @@ function move(event)
 
 
             case 'ArrowLeft':
-                if(direction!="ArrowRight")
+                if(direction!="ArrowRight" &&direction!="")
                 {
                     
                     clearInterval(moveInterval);
